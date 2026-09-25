@@ -90,6 +90,64 @@ const createTodoItem = (title, completed = false) => {
 
 const getTodos = () => [...todoState];
 
+const escapeHtml = (value) =>
+  String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const renderTodoList = (container = null) => {
+  const target =
+    container ||
+    (typeof document !== "undefined"
+      ? document.querySelector("#todo-list")
+      : null);
+
+  if (!target) {
+    return [];
+  }
+
+  const todos = getTodos();
+
+  if (todos.length === 0) {
+    target.innerHTML = '<p class="todo-empty">No todos yet.</p>';
+    return todos;
+  }
+
+  target.innerHTML = `
+    <ul class="todo-list">
+      ${todos
+        .map(
+          ({ title, completed }) => `
+            <li class="todo-item ${completed ? "is-complete" : ""}">
+              <span class="todo-title">${escapeHtml(title)}</span>
+              <span class="todo-status">${completed ? "Completed" : "Incomplete"}</span>
+            </li>
+          `,
+        )
+        .join("")}
+    </ul>
+  `;
+
+  return todos;
+};
+
+const initializeTodoAppUI = () => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const listContainer = document.querySelector("#todo-list");
+
+  if (!listContainer) {
+    return null;
+  }
+
+  return renderTodoList(listContainer);
+};
+
 const updateTodoItem = (index, updates = {}) => {
   if (typeof index !== "number" || index < 0 || index >= todoState.length) {
     return null;
@@ -152,6 +210,8 @@ const todoAppContract = {
   todoState,
   createTodoItem,
   getTodos,
+  renderTodoList,
+  initializeTodoAppUI,
   updateTodoItem,
   deleteTodoItem,
 };
@@ -162,6 +222,10 @@ if (typeof globalThis !== "undefined") {
 
 if (typeof window !== "undefined") {
   window.todoAppContract = todoAppContract;
+}
+
+if (typeof document !== "undefined") {
+  initializeTodoAppUI();
 }
 
 console.log("Todo in-memory state and CRUD behavior defined.");

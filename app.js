@@ -134,18 +134,81 @@ const renderTodoList = (container = null) => {
   return todos;
 };
 
+const showTodoFormMessage = (message, isError = false) => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const messageElement = document.querySelector("#todo-form-message");
+
+  if (!messageElement) {
+    return null;
+  }
+
+  messageElement.textContent = message;
+  messageElement.classList.toggle("is-error", isError);
+  return messageElement;
+};
+
+const handleCreateTodoSubmit = (event) => {
+  if (event && typeof event.preventDefault === "function") {
+    event.preventDefault();
+  }
+
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const titleInput = document.querySelector("#todo-title-input");
+  const completedInput = document.querySelector("#todo-completed-input");
+
+  if (!titleInput) {
+    return null;
+  }
+
+  const title = titleInput.value;
+  const completed = completedInput ? completedInput.checked : false;
+  const createdTodo = createTodoItem(title, completed);
+
+  if (!createdTodo) {
+    showTodoFormMessage("Todo title is required.", true);
+    return null;
+  }
+
+  titleInput.value = "";
+  if (completedInput) {
+    completedInput.checked = false;
+  }
+
+  showTodoFormMessage("Todo added.", false);
+  renderTodoList();
+  return createdTodo;
+};
+
 const initializeTodoAppUI = () => {
   if (typeof document === "undefined") {
     return null;
   }
 
   const listContainer = document.querySelector("#todo-list");
+  const todoForm = document.querySelector("#todo-form");
 
   if (!listContainer) {
     return null;
   }
 
-  return renderTodoList(listContainer);
+  renderTodoList(listContainer);
+
+  if (
+    todoForm &&
+    !todoForm.dataset.todoCreateBound &&
+    typeof todoForm.addEventListener === "function"
+  ) {
+    todoForm.addEventListener("submit", handleCreateTodoSubmit);
+    todoForm.dataset.todoCreateBound = "true";
+  }
+
+  return listContainer;
 };
 
 const updateTodoItem = (index, updates = {}) => {
@@ -211,6 +274,8 @@ const todoAppContract = {
   createTodoItem,
   getTodos,
   renderTodoList,
+  showTodoFormMessage,
+  handleCreateTodoSubmit,
   initializeTodoAppUI,
   updateTodoItem,
   deleteTodoItem,

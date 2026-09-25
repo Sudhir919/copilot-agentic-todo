@@ -43,6 +43,59 @@ h1 {
   font-size: 1.25rem;
 }
 
+.todo-form {
+  margin-bottom: 1.5rem;
+}
+
+.todo-input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.todo-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.todo-form-row input[type="text"] {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.todo-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.todo-form-row button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.todo-form-message {
+  min-height: 1.25rem;
+  margin: 0.75rem 0 0;
+  color: #0f766e;
+}
+
+.todo-form-message.is-error {
+  color: #b91c1c;
+}
+
 .todo-list-container {
   min-height: 2rem;
 }

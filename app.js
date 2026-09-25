@@ -69,7 +69,12 @@ const writeTodosToStorage = (todos) => {
   return safeTodos;
 };
 
-const todoState = [];
+const todoState = readTodosFromStorage();
+
+const persistTodoState = () => {
+  writeTodosToStorage(todoState);
+  return todoState;
+};
 
 const createTodoItem = (title, completed = false) => {
   const todo = createTodo(title, completed);
@@ -79,6 +84,7 @@ const createTodoItem = (title, completed = false) => {
   }
 
   todoState.push(todo);
+  persistTodoState();
   return todo;
 };
 
@@ -119,6 +125,7 @@ const updateTodoItem = (index, updates = {}) => {
   };
 
   todoState[index] = nextTodo;
+  persistTodoState();
   return todoState[index];
 };
 
@@ -128,6 +135,7 @@ const deleteTodoItem = (index) => {
   }
 
   todoState.splice(index, 1);
+  persistTodoState();
   return true;
 };
 
@@ -140,6 +148,7 @@ const todoAppContract = {
   normalizeTodo,
   readTodosFromStorage,
   writeTodosToStorage,
+  persistTodoState,
   todoState,
   createTodoItem,
   getTodos,

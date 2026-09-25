@@ -139,6 +139,14 @@ const renderTodoList = (container = null) => {
                     <span>Completed</span>
                   </label>
                   <button type="submit">Save</button>
+                  <button
+                    type="button"
+                    class="todo-delete-button"
+                    data-index="${index}"
+                    aria-label="Delete todo"
+                  >
+                    Delete
+                  </button>
                 </div>
                 <p class="todo-update-message" aria-live="polite"></p>
               </form>
@@ -159,9 +167,48 @@ const renderTodoList = (container = null) => {
         form.dataset.todoUpdateBound = "true";
       }
     });
+
+    target.querySelectorAll(".todo-delete-button").forEach((button) => {
+      if (
+        !button.dataset.todoDeleteBound &&
+        typeof button.addEventListener === "function"
+      ) {
+        button.addEventListener("click", handleTodoDeleteClick);
+        button.dataset.todoDeleteBound = "true";
+      }
+    });
   }
 
   return todos;
+};
+
+const handleTodoDeleteClick = (event) => {
+  if (event && typeof event.preventDefault === "function") {
+    event.preventDefault();
+  }
+
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const button =
+    event && event.target && typeof event.target.closest === "function"
+      ? event.target.closest(".todo-delete-button")
+      : null;
+
+  if (!button) {
+    return null;
+  }
+
+  const index = Number(button.dataset.index);
+  const deleted = deleteTodoItem(index);
+
+  if (!deleted) {
+    return null;
+  }
+
+  renderTodoList();
+  return deleted;
 };
 
 const handleTodoUpdateSubmit = (event) => {
@@ -353,6 +400,7 @@ const todoAppContract = {
   createTodoItem,
   getTodos,
   renderTodoList,
+  handleTodoDeleteClick,
   handleTodoUpdateSubmit,
   showTodoFormMessage,
   handleCreateTodoSubmit,

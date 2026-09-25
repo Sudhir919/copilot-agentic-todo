@@ -69,7 +69,14 @@ const readTodosFromStorage = () => {
 
 const writeTodosToStorage = (todos) => {
   const safeTodos = Array.isArray(todos)
-    ? todos.map(normalizeTodo).filter((todo) => todo !== null)
+    ? todos
+        .map(normalizeTodo)
+        .filter(
+          (todo) =>
+            todo !== null &&
+            typeof todo.title === "string" &&
+            todo.title.trim().length > 0,
+        )
     : [];
 
   try {

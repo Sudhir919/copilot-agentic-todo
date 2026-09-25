@@ -290,7 +290,11 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof document !== "undefined") {
-  initializeTodoAppUI();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeTodoAppUI);
+  } else {
+    initializeTodoAppUI();
+  }
 }
 
 console.log("Todo in-memory state and CRUD behavior defined.");

@@ -124,6 +124,52 @@ h1 {
   border-color: #b5e8c5;
 }
 
+.todo-update-form {
+  width: 100%;
+}
+
+.todo-update-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.todo-update-title {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.todo-update-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.todo-update-form button {
+  padding: 0.6rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  background: #0f766e;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.todo-update-message {
+  min-height: 1.25rem;
+  margin: 0.5rem 0 0;
+  color: #0f766e;
+}
+
+.todo-update-message.is-error {
+  color: #b91c1c;
+}
+
 .todo-title {
   font-weight: 600;
   word-break: break-word;

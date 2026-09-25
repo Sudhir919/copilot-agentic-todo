@@ -120,10 +120,28 @@ const renderTodoList = (container = null) => {
     <ul class="todo-list">
       ${todos
         .map(
-          ({ title, completed }) => `
+          ({ title, completed }, index) => `
             <li class="todo-item ${completed ? "is-complete" : ""}">
-              <span class="todo-title">${escapeHtml(title)}</span>
-              <span class="todo-status">${completed ? "Completed" : "Incomplete"}</span>
+              <form class="todo-update-form" data-index="${index}" novalidate>
+                <div class="todo-update-row">
+                  <input
+                    class="todo-update-title"
+                    type="text"
+                    value="${escapeHtml(title)}"
+                    aria-label="Update todo title"
+                  />
+                  <label class="todo-update-checkbox">
+                    <input
+                      class="todo-update-status"
+                      type="checkbox"
+                      ${completed ? "checked" : ""}
+                    />
+                    <span>Completed</span>
+                  </label>
+                  <button type="submit">Save</button>
+                </div>
+                <p class="todo-update-message" aria-live="polite"></p>
+              </form>
             </li>
           `,
         )
@@ -131,7 +149,68 @@ const renderTodoList = (container = null) => {
     </ul>
   `;
 
+  if (typeof target.querySelectorAll === "function") {
+    target.querySelectorAll(".todo-update-form").forEach((form) => {
+      if (
+        !form.dataset.todoUpdateBound &&
+        typeof form.addEventListener === "function"
+      ) {
+        form.addEventListener("submit", handleTodoUpdateSubmit);
+        form.dataset.todoUpdateBound = "true";
+      }
+    });
+  }
+
   return todos;
+};
+
+const handleTodoUpdateSubmit = (event) => {
+  if (event && typeof event.preventDefault === "function") {
+    event.preventDefault();
+  }
+
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const form =
+    event && event.target && typeof event.target.closest === "function"
+      ? event.target.closest(".todo-update-form")
+      : null;
+
+  if (!form) {
+    return null;
+  }
+
+  const index = Number(form.dataset.index);
+  const titleInput = form.querySelector(".todo-update-title");
+  const completedInput = form.querySelector(".todo-update-status");
+  const messageElement = form.querySelector(".todo-update-message");
+
+  if (!titleInput || Number.isNaN(index)) {
+    return null;
+  }
+
+  const updatedTodo = updateTodoItem(index, {
+    title: titleInput.value,
+    completed: completedInput ? completedInput.checked : false,
+  });
+
+  if (!updatedTodo) {
+    if (messageElement) {
+      messageElement.textContent = "Todo title is required.";
+      messageElement.classList.toggle("is-error", true);
+    }
+    return null;
+  }
+
+  if (messageElement) {
+    messageElement.textContent = "Todo updated.";
+    messageElement.classList.toggle("is-error", false);
+  }
+
+  renderTodoList();
+  return updatedTodo;
 };
 
 const showTodoFormMessage = (message, isError = false) => {
@@ -274,6 +353,7 @@ const todoAppContract = {
   createTodoItem,
   getTodos,
   renderTodoList,
+  handleTodoUpdateSubmit,
   showTodoFormMessage,
   handleCreateTodoSubmit,
   initializeTodoAppUI,

@@ -1,9 +1,30 @@
 const TODO_STORAGE_KEY = "todo-items";
 
-const createTodo = (title, completed = false) => ({
-  title: String(title),
-  completed: Boolean(completed),
-});
+const isValidTodoTitle = (title) =>
+  typeof title === "string" && title.trim().length > 0;
+
+const isValidTodoCompletion = (completed) => typeof completed === "boolean";
+
+const validateTodoInput = (title, completed) => {
+  if (!isValidTodoTitle(title) || !isValidTodoCompletion(completed)) {
+    return null;
+  }
+
+  return {
+    title: title.trim(),
+    completed,
+  };
+};
+
+const createTodo = (title, completed = false) => {
+  const validatedTodo = validateTodoInput(title, completed);
+
+  if (!validatedTodo) {
+    return null;
+  }
+
+  return { ...validatedTodo };
+};
 
 const normalizeTodo = (todo) => {
   if (!todo || typeof todo !== "object") {
@@ -52,6 +73,11 @@ const todoState = [];
 
 const createTodoItem = (title, completed = false) => {
   const todo = createTodo(title, completed);
+
+  if (!todo) {
+    return null;
+  }
+
   todoState.push(todo);
   return todo;
 };
@@ -64,14 +90,33 @@ const updateTodoItem = (index, updates = {}) => {
   }
 
   const current = todoState[index];
-  const nextTodo = normalizeTodo({
-    ...current,
-    ...updates,
-  });
+  const hasTitleUpdate = Object.prototype.hasOwnProperty.call(updates, "title");
+  const hasCompletedUpdate = Object.prototype.hasOwnProperty.call(
+    updates,
+    "completed",
+  );
 
-  if (!nextTodo || nextTodo.title === "") {
+  if (hasTitleUpdate && !isValidTodoTitle(updates.title)) {
     return null;
   }
+
+  if (hasCompletedUpdate && !isValidTodoCompletion(updates.completed)) {
+    return null;
+  }
+
+  const nextTitle = hasTitleUpdate ? updates.title : current.title;
+  const nextCompleted = hasCompletedUpdate
+    ? updates.completed
+    : current.completed;
+
+  if (!isValidTodoTitle(nextTitle) || !isValidTodoCompletion(nextCompleted)) {
+    return null;
+  }
+
+  const nextTodo = {
+    title: nextTitle.trim(),
+    completed: nextCompleted,
+  };
 
   todoState[index] = nextTodo;
   return todoState[index];
@@ -88,6 +133,9 @@ const deleteTodoItem = (index) => {
 
 const todoAppContract = {
   TODO_STORAGE_KEY,
+  isValidTodoTitle,
+  isValidTodoCompletion,
+  validateTodoInput,
   createTodo,
   normalizeTodo,
   readTodosFromStorage,

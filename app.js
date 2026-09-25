@@ -1,4 +1,5 @@
 const TODO_STORAGE_KEY = "todo-items";
+let lastStorageError = null;
 
 const isValidTodoTitle = (title) =>
   typeof title === "string" && title.trim().length > 0;
@@ -38,23 +39,30 @@ const normalizeTodo = (todo) => {
 };
 
 const readTodosFromStorage = () => {
-  const rawTodos = localStorage.getItem(TODO_STORAGE_KEY);
-
-  if (!rawTodos) {
-    return [];
-  }
-
   try {
-    const parsedTodos = JSON.parse(rawTodos);
+    const rawTodos = localStorage.getItem(TODO_STORAGE_KEY);
 
-    if (!Array.isArray(parsedTodos)) {
+    if (!rawTodos) {
+      lastStorageError = null;
       return [];
     }
 
-    return parsedTodos
+    const parsedTodos = JSON.parse(rawTodos);
+
+    if (!Array.isArray(parsedTodos)) {
+      lastStorageError = null;
+      return [];
+    }
+
+    const normalizedTodos = parsedTodos
       .map(normalizeTodo)
       .filter((todo) => todo !== null && todo.title !== "");
+
+    lastStorageError = null;
+    return normalizedTodos;
   } catch (error) {
+    lastStorageError = "Could not load saved todos.";
+    console.error(error);
     return [];
   }
 };
@@ -64,9 +72,15 @@ const writeTodosToStorage = (todos) => {
     ? todos.map(normalizeTodo).filter((todo) => todo !== null)
     : [];
 
-  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(safeTodos));
-
-  return safeTodos;
+  try {
+    localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(safeTodos));
+    lastStorageError = null;
+    return safeTodos;
+  } catch (error) {
+    lastStorageError = "Could not save todos. Your changes may not be saved.";
+    console.error(error);
+    return safeTodos;
+  }
 };
 
 const todoState = readTodosFromStorage();
@@ -191,6 +205,8 @@ const handleTodoDeleteClick = (event) => {
     return null;
   }
 
+  lastStorageError = null;
+
   const button =
     event && event.target && typeof event.target.closest === "function"
       ? event.target.closest(".todo-delete-button")
@@ -207,6 +223,12 @@ const handleTodoDeleteClick = (event) => {
     return null;
   }
 
+  if (lastStorageError) {
+    showStorageErrorMessage();
+    renderTodoList();
+    return deleted;
+  }
+
   renderTodoList();
   return deleted;
 };
@@ -219,6 +241,8 @@ const handleTodoUpdateSubmit = (event) => {
   if (typeof document === "undefined") {
     return null;
   }
+
+  lastStorageError = null;
 
   const form =
     event && event.target && typeof event.target.closest === "function"
@@ -245,10 +269,18 @@ const handleTodoUpdateSubmit = (event) => {
 
   if (!updatedTodo) {
     if (messageElement) {
-      messageElement.textContent = "Todo title is required.";
+      messageElement.textContent = "Please enter a valid todo title.";
       messageElement.classList.toggle("is-error", true);
     }
     return null;
+  }
+
+  if (lastStorageError) {
+    if (messageElement) {
+      showStorageErrorMessage(messageElement);
+    }
+    renderTodoList();
+    return updatedTodo;
   }
 
   if (messageElement) {
@@ -276,6 +308,18 @@ const showTodoFormMessage = (message, isError = false) => {
   return messageElement;
 };
 
+const showStorageErrorMessage = (messageElement = null) => {
+  const message = lastStorageError || "Could not save todos.";
+
+  if (messageElement) {
+    messageElement.textContent = message;
+    messageElement.classList.toggle("is-error", true);
+    return messageElement;
+  }
+
+  return showTodoFormMessage(message, true);
+};
+
 const handleCreateTodoSubmit = (event) => {
   if (event && typeof event.preventDefault === "function") {
     event.preventDefault();
@@ -284,6 +328,8 @@ const handleCreateTodoSubmit = (event) => {
   if (typeof document === "undefined") {
     return null;
   }
+
+  lastStorageError = null;
 
   const titleInput = document.querySelector("#todo-title-input");
   const completedInput = document.querySelector("#todo-completed-input");
@@ -297,8 +343,19 @@ const handleCreateTodoSubmit = (event) => {
   const createdTodo = createTodoItem(title, completed);
 
   if (!createdTodo) {
-    showTodoFormMessage("Todo title is required.", true);
+    showTodoFormMessage("Please enter a valid todo title.", true);
     return null;
+  }
+
+  if (lastStorageError) {
+    titleInput.value = "";
+    if (completedInput) {
+      completedInput.checked = false;
+    }
+
+    showStorageErrorMessage();
+    renderTodoList();
+    return createdTodo;
   }
 
   titleInput.value = "";
@@ -399,10 +456,12 @@ const todoAppContract = {
   todoState,
   createTodoItem,
   getTodos,
+  escapeHtml,
   renderTodoList,
   handleTodoDeleteClick,
   handleTodoUpdateSubmit,
   showTodoFormMessage,
+  showStorageErrorMessage,
   handleCreateTodoSubmit,
   initializeTodoAppUI,
   updateTodoItem,

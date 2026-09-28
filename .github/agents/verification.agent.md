@@ -1,5 +1,5 @@
 ---
-name: verification
+name: Verification Agent
 description: Verifies the completed Todo application against requirements, tests, documentation, and final project scope.
 argument-hint: Perform final verification of the completed Todo application.
 ---

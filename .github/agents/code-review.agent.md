@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: Code Review Agent
 description: Performs a structured code review against approved requirements, architecture, tests, security, error handling, code quality, and dependency safety.
 argument-hint: Review the completed Todo application against the approved project artifacts.
 ---

@@ -73,7 +73,7 @@ No out-of-scope feature was identified in the application code or tests.
 
 ## Final Status
 
-Status: Ready for PR creation.
+Status: Ready for PR update.
 
 Reasoning:
 

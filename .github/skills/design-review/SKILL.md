@@ -1,3 +1,4 @@
+---
 name: design-review
 description: Reusable workflow for reviewing architecture against approved requirements, identifying evidence-based risks, and keeping the design aligned with project scope.
 

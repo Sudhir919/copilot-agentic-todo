@@ -1,3 +1,4 @@
+---
 name: architecture-design
 description: Reusable workflow for deriving a simple high-level architecture from approved requirements while preserving the project's intentionally small scope.
 

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "if [ ! -f pr.md ]; then printf '{\"decision\":\"allow\"}'; exit 0; fi; files='pr.md implementation.md verification-report.md code-review.md CHANGELOG.md'; for file in $files; do [ -s \"$file\" ] || { printf '{\"decision\":\"block\",\"reason\":\"PR readiness validation failed. Required SDLC artifacts are missing or empty.\"}'; exit 0; }; done; printf '{\"decision\":\"allow\"}'",
+        "powershell": "if (-not (Test-Path 'pr.md')) { Write-Output '{\"decision\":\"allow\"}'; exit 0 }; $files = @('pr.md', 'implementation.md', 'verification-report.md', 'code-review.md', 'CHANGELOG.md'); foreach ($file in $files) { if (-not (Test-Path $file) -or (Get-Item $file).Length -le 0) { Write-Output '{\"decision\":\"block\",\"reason\":\"PR readiness validation failed. Required SDLC artifacts are missing or empty.\"}'; exit 0 } }; Write-Output '{\"decision\":\"allow\"}'",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}

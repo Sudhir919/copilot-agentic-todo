@@ -1,3 +1,4 @@
+---
 name: verification
 description: Reusable workflow for final project verification that checks behavior, documentation, tests, and scope compliance with recorded evidence.
 

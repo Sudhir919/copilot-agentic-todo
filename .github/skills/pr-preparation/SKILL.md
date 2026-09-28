@@ -1,3 +1,4 @@
+---
 name: pr-preparation
 description: Reusable workflow for final pull request preparation, including readiness checks, evidence gathering, and safe handling of existing pull requests.
 

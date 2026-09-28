@@ -1,3 +1,4 @@
+---
 name: implementation
 description: Reusable workflow for implementing only approved tasks while preserving architecture, validating changes, and preventing scope creep or unsafe Git actions.
 

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <h1>Todo App</h1>
+      </header>
+
+      <main class="app-main" aria-live="polite">
+        <section class="todo-panel" aria-labelledby="todo-list-heading">
+          <h2 id="todo-list-heading">Todo List</h2>
+
+          <form id="todo-form" class="todo-form" novalidate>
+            <label class="todo-input-label" for="todo-title-input"
+              >Todo title</label
+            >
+            <div class="todo-form-row">
+              <input
+                id="todo-title-input"
+                name="todo-title"
+                type="text"
+                placeholder="Add a todo"
+                aria-label="Todo title"
+              />
+              <label class="todo-checkbox-label" for="todo-completed-input">
+                <input id="todo-completed-input" type="checkbox" />
+                <span>Completed</span>
+              </label>
+              <button type="submit">Add Todo</button>
+            </div>
+            <p
+              id="todo-form-message"
+              class="todo-form-message"
+              aria-live="polite"
+            ></p>
+          </form>
+
+          <div id="todo-list" class="todo-list-container"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
